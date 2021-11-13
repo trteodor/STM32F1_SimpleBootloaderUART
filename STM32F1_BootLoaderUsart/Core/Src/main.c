@@ -109,9 +109,14 @@ void jump_to_application(uint32_t const app_address) {
 
 BootloaderCommand get_command(UART_HandleTypeDef* const uart, uint32_t const timeout) {
   BootloaderCommand cmd = { .opcode = BOOTLOADER_CMD_INVALID };
-  uint8_t buffer[5] = { };
+  uint8_t buffer[5] = { 0 };
 
   HAL_StatusTypeDef status = HAL_UART_Receive(uart, buffer, 5, timeout);
+  if(buffer[0]==0x01)
+  {
+	  volatile int i;
+	  UNUSED(i);
+  }
   if (status == HAL_OK) {
     cmd.opcode = buffer[0];
     // Assuming big-endian data coming from programmer
@@ -264,16 +269,40 @@ int main(void)
   MX_CRC_Init();
   /* USER CODE BEGIN 2 */
   printf("Hello, this is bootloader. Waiting for firmware.\r\n");
-  HAL_FLASH_Unlock();
-  erase_application(AppFrPageAddr, AppPagesNum);
-  printf("Appliation erassed.\r\n");
-  while(1);
+//  HAL_FLASH_Unlock();
+//  erase_application(AppFrPageAddr, AppPagesNum);
+//  printf("Appliation erassed.\r\n");
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	  static char buf[20]={0};
+	  uint8_t size;
+	  while(1)
+	  {
+		  HAL_UART_Receive(&huart2, buf, 20, 100);
+		  if(buf[0]!=0)
+		  {
+			  for(int j=0; j<20; j++)
+			  {
+				  if(buf[j]==0)
+				  {
+					  size = j;
+					  break;
+				  }
+			  }
+
+			  HAL_UART_Transmit(&huart2, buf, size, 100);
+			  for(int i=0; i<20; i++)
+			  {
+				  buf[i]=0;
+			  }
+		  }
+	  }
+
+
 	   	BootloaderCommand cmd = get_command(&huart2, 100);
 	    switch (cmd.opcode) {
 	        case BOOTLOADER_CMD_ECHO: {
