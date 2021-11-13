@@ -99,7 +99,7 @@ def main():
 
     try:
         stm_uart = serial.Serial(
-            port=args.com_port, baudrate=921600, timeout=20)
+            port=args.com_port, baudrate=115200, timeout=20)
     except serial.SerialException as ex:
         print(
             f'Cannot open STM32 port: {ex}. Make sure it\'s not opened by another application!')

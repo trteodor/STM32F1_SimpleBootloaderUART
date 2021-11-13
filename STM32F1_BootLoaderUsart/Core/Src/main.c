@@ -278,77 +278,60 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  static char buf[20]={0};
-	  uint8_t size;
-	  while(1)
-	  {
-		  HAL_UART_Receive(&huart2, buf, 20, 100);
-		  if(buf[0]!=0)
-		  {
-			  for(int j=0; j<20; j++)
-			  {
-				  if(buf[j]==0)
-				  {
-					  size = j;
-					  break;
-				  }
-			  }
-
-			  HAL_UART_Transmit(&huart2, buf, size, 100);
-			  for(int i=0; i<20; i++)
-			  {
-				  buf[i]=0;
-			  }
-		  }
-	  }
-
-
-	   	BootloaderCommand cmd = get_command(&huart2, 100);
+	    BootloaderCommand cmd = get_command(&huart2, 100);
 	    switch (cmd.opcode) {
-	        case BOOTLOADER_CMD_ECHO: {
-	          // Simple echo request, respond with OK to tell that
-	          // the bootloader is running.
-	          respond_ok(&huart2);
-	          break;
-	        }
-	        case BOOTLOADER_CMD_SETSIZE: {
-	          // Set the app size and respond with OK
-	          applicationSize = cmd.data;
-	          respond_ok(&huart2);
-	          break;
-	        }
-	        case BOOTLOADER_CMD_UPDATE: {
-	          // TODO
-	          break;
-	        }
-	        case BOOTLOADER_CMD_CHECK: {
-	          // TODO
-	          break;
-	        }
-	        case BOOTLOADER_CMD_JUMP: {
-	          // Jump directly to the application.
-	          respond_ok(&huart2);
-	          jump_to_application(APPLICATION_ADDRESS);
-	          break;
-	        }
-	        case BOOTLOADER_CMD_INVALID: {
-	          // No command received. We have to handle this case, because
-	          // otherwise the bootloader would indefinitely spam ERR
-	          // while nothing is happening.
-	          break;
-	        }
-	        default: {
-	          // Invalid opcode, respond with error.
-	          respond_err(&huart2);
-	          break;
-	        }
-	        }
+	    case BOOTLOADER_CMD_ECHO: {
+	      // Simple echo request, respond with OK to tell that
+	      // the bootloader is running.
+	      respond_ok(&huart2);
+	      break;
+	    }
+	    case BOOTLOADER_CMD_SETSIZE: {
+	      // Set the app size and respond with OK
+	      applicationSize = cmd.data;
+	      respond_ok(&huart2);
+	      break;
+	    }
+	    case BOOTLOADER_CMD_UPDATE: {
+	      if (receive_and_flash_firmware(&huart2, applicationSize)) {
+	        respond_ok(&huart2);
+	      } else {
+	        respond_err(&huart2);
+	      }
+	      break;
+	    }
+	    case BOOTLOADER_CMD_CHECK: {
+	      if (verify_firmware(applicationSize, cmd.data)) {
+	        respond_ok(&huart2);
+	      } else {
+	        respond_err(&huart2);
+	      }
+	      break;
+	    }
+	    case BOOTLOADER_CMD_JUMP: {
+	      // Jump directly to the application.
+	      respond_ok(&huart2);
+	      jump_to_application(APPLICATION_ADDRESS);
+	      break;
+	    }
+	    case BOOTLOADER_CMD_INVALID: {
+	      // No command received. We have to handle this case, because
+	      // otherwise the bootloader would indefinitely spam ERR
+	      // while nothing is happening.
+	      break;
+	    }
+	    default: {
+	      // Invalid opcode, respond with error.
+	      respond_err(&huart2);
+	      break;
+	    }
+	    }
 
-	        if (buttonPressed) {
-	          buttonPressed = false;
-	          // jump to application
-	          jump_to_application(APPLICATION_ADDRESS);
-	        }
+	    if (buttonPressed) {
+	      buttonPressed = false;
+	      // jump to application
+	      jump_to_application(APPLICATION_ADDRESS);
+	    }
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
