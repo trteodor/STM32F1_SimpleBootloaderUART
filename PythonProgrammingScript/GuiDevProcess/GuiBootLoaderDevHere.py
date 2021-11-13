@@ -172,16 +172,15 @@ class MainSerial:
         self.ReceDataView.delete("1.0", "end")
 
     def button_Send_click(self):
-        try:
+
             if self.myserial.port.isOpen() == True:
                 print ("start sending data")
-                send_str1 = self.entrySend.get()
+                send_str1 = self.EnTrysend.get()
                 self.myserial.Write_data(send_str1)
                 self.SendDataView.insert(tkinter.INSERT, send_str1+" ")
                 print ("Send Data Success")
             else:
                 print ("The serial port is not open")
-        except:
                 print ("Send Failed")
     def button_Rece_click(self):
         try:

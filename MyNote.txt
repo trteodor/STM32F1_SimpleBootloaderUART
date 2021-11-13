@@ -2,7 +2,5 @@ Wyczyścić pamięc w stlink utlity - mieć pewność że nic tam ni ma..
 W linkerze dla aplikaci przesuwam adres początku programu z 0x8000000 NA: 0x8004000,   LENGTH = 112K!!!
 program nie zadziała - trzeba wejść do debugu i ręcznie ustawić programowi, MSP i PC w rejestrach rdzenia
 MSP: 0x20005000
-PC: 0x8008000
-póki co przerwania mi nie działają :( 
-Ale to na spokojnie
-Nwm, jak z boot loadera wyskocze na ten ten to działa Oo ciekawe :/ 
+PC: 0x8008000 ale +4 bo tam jest skok do reset handlera.. PC: 0x8008004 pod adresem PC: 0x8008000 jest przecież adres pocz stosu czyli 0x20005000
+Ustawić przesunięcie tablicy wektorów w rejestrze VTOR żeby przerwania działały
