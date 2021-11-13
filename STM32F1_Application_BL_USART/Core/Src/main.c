@@ -24,7 +24,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include <stdio.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -44,7 +44,7 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-
+unsigned buttonCounter = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -88,7 +88,7 @@ int main(void)
   MX_GPIO_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
-
+  printf("Hello, world!\r\n");
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -140,7 +140,18 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+int _write(int file, char* ptr, int len) {
+  HAL_UART_Transmit(&huart2, (uint8_t*) ptr, len, HAL_MAX_DELAY);
+  return len;
+}
 
+void HAL_GPIO_EXTI_Callback(uint16_t pin) {
+  if (pin == B1_Pin) {
+    HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
+    buttonCounter++;
+    printf("Button has been pressed %d time(s) already!\r\n", buttonCounter);
+  }
+}
 /* USER CODE END 4 */
 
 /**
