@@ -269,6 +269,7 @@ int main(void)
   MX_CRC_Init();
   /* USER CODE BEGIN 2 */
   printf("Hello, this is bootloader. Waiting for firmware.\r\n");
+  printf("Tap button on board to Run Application.\r\n");
 //  HAL_FLASH_Unlock();
 //  erase_application(AppFrPageAddr, AppPagesNum);
 //  printf("Appliation erassed.\r\n");

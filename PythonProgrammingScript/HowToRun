@@ -1,0 +1,3 @@
+python update.py STM32F1_Application_BL_USART.bin COM6
+
+for sure name your app and COM port where is you application
